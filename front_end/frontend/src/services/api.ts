@@ -1,34 +1,33 @@
-import { Task, CreateTaskDTO, UpdateTaskDTO } from '../types/task';
+import axios, { AxiosError } from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL;
+interface Task {
+  _id?: string;
+  title: string;
+  description?: string;
+  status: 'pending' | 'in progress' | 'completed';
+  dueDate?: Date;
+}
 
-export const taskService = {
-  async getAllTasks(): Promise<Task[]> {
-    const response = await fetch(`${API_URL}/tasks`);
-    return response.json();
+const api = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  headers: {
+    'Content-Type': 'application/json',
   },
+});
 
-  async createTask(task: CreateTaskDTO): Promise<Task> {
-    const response = await fetch(`${API_URL}/tasks`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(task),
-    });
-    return response.json();
-  },
-
-  async updateTask(id: string, task: UpdateTaskDTO): Promise<Task> {
-    const response = await fetch(`${API_URL}/tasks/${id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(task),
-    });
-    return response.json();
-  },
-
-  async deleteTask(id: string): Promise<void> {
-    await fetch(`${API_URL}/tasks/${id}`, {
-      method: 'DELETE',
-    });
+// Add error interceptor
+api.interceptors.response.use(
+  response => response,
+  (error: AxiosError) => {
+    console.error('API Error:', error.response?.data);
+    return Promise.reject(error);
   }
-};
+);
+
+export const getTasks = () => api.get<Task[]>('/api/tasks');
+export const createTask = (task: Task) => api.post<Task>('/api/tasks', task);
+export const updateTask = (id: string, task: Task) => api.put<Task>(`/api/tasks/${id}`, task);
+export const deleteTask = (id: string) => api.delete(`/api/tasks/${id}`);
+
+export type { Task };
+export default api;
