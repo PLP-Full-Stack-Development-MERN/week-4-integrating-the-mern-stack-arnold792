@@ -3,7 +3,7 @@
 
 **Objective:**
 
-- Develop a full-stack web application using the MERN stack.
+- Develop a full-stack web applicatilog.info()on using the MERN stack.
 - Apply backend and frontend integration skills.
 - Practice RESTful API development and consumption.
 - Implement CRUD operations and proper project structuring.
